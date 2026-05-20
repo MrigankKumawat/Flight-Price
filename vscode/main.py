@@ -8,8 +8,8 @@ app = Flask(__name__)
 CORS(app)  # <-- enable CORS so HTML form can call API
 
 # Load model and pipeline
-model = joblib.load("model.pkl")
-pipeline = joblib.load("pipeline.pkl")
+model = joblib.load("vscode/model.pkl")
+pipeline = joblib.load("vscpde/pipeline.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
