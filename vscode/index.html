@@ -3,196 +3,508 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flight Price Predictor</title>
+  <title>SkyFare — Flight Price Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F4F1EC;
+      --surface:   #FFFFFF;
+      --ink:       #1A1814;
+      --ink-2:     #6B6760;
+      --ink-3:     #B0ADA8;
+      --accent:    #E85D2F;
+      --accent-2:  #F5A623;
+      --border:    #E2DED8;
+      --border-2:  #CCC8C1;
+      --success:   #2D8653;
+      --success-bg:#EBF5EF;
+      --error:     #C0392B;
+      --error-bg:  #FDEEEC;
+      --radius:    14px;
+      --radius-sm: 8px;
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    }
+
     body {
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      padding: 20px;
+      padding: 40px 20px 60px;
     }
-    .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      width: 420px;
-      transition: 0.3s;
-    }
-    .card:hover { transform: translateY(-4px); }
-    h2 {
+
+    /* Header */
+    .header {
       text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s ease both;
     }
-    label {
-      font-weight: 600;
-      margin-bottom: 6px;
-      display: block;
-      color: #444;
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
     }
-    select, input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-    select:focus, input:focus {
-      border-color: #4facfe;
-      outline: none;
-      box-shadow: 0 0 6px rgba(79,172,254,0.4);
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--accent);
       border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; fill: #fff; }
+    .logo-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px; font-weight: 800;
+      letter-spacing: -0.5px; color: var(--ink);
+    }
+    .tagline {
+      font-size: 13px; color: var(--ink-2);
+      letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 560px;
+      overflow: hidden;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .card-header {
+      padding: 28px 32px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--ink);
+    }
+    .card-subtitle { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+    .badge {
+      background: #FFF3ED; color: var(--accent);
+      font-size: 12px; font-weight: 600;
+      padding: 5px 12px; border-radius: 999px;
+      border: 1px solid #FDDCC9; letter-spacing: 0.02em;
+    }
+
+    /* Form */
+    .form-body { padding: 28px 32px; }
+
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .row.trio { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+
+    select, input[type="number"] {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg); color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 400;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      appearance: none; -webkit-appearance: none;
+      outline: none; cursor: pointer;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B6760' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    select:focus, input[type="number"]:focus {
+      border-color: var(--accent); background: #fff;
+      box-shadow: 0 0 0 3px rgba(232,93,47,0.1);
+    }
+    select:hover, input[type="number"]:hover { border-color: var(--border-2); }
+    input[type="number"]::placeholder { color: var(--ink-3); }
+
+    /* Route visual */
+    .route-visual {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+    }
+    .route-city { flex: 1; text-align: center; }
+    .route-city-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--ink); min-height: 20px;
+    }
+    .route-city-label {
+      font-size: 11px; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
+    }
+    .route-arrow {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px; flex-shrink: 0; padding: 0 8px;
+    }
+    .route-line { display: flex; align-items: center; gap: 6px; }
+    .route-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .route-dash {
+      height: 1.5px; width: 48px;
+      background: repeating-linear-gradient(90deg, var(--ink-3) 0, var(--ink-3) 4px, transparent 4px, transparent 8px);
+    }
+    .route-plane svg { width: 18px; height: 18px; fill: var(--accent); display: block; }
+    .stops-badge {
+      font-size: 10px; font-weight: 600; color: var(--ink-2);
+      background: var(--border); padding: 2px 8px;
+      border-radius: 999px; text-align: center;
+    }
+
+    /* Button */
+    .btn-wrap { margin-top: 24px; }
+    .btn-predict {
+      width: 100%; padding: 14px 24px;
+      background: var(--ink); color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.02em;
+      border: none; border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
+      position: relative; overflow: hidden;
     }
-    button:hover { background: linear-gradient(135deg, #3c9cff, #00e0e0); }
-    .result {
-      text-align: center;
-      margin-top: 18px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #2ecc71;
+    .btn-predict::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      opacity: 0; transition: opacity 0.25s;
     }
-    .error {
-      color: #e74c3c;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 16px;
+    .btn-predict:hover::before { opacity: 1; }
+    .btn-predict:hover { box-shadow: 0 4px 16px rgba(232,93,47,0.35); transform: translateY(-1px); }
+    .btn-predict:active { transform: translateY(0); }
+    .btn-predict:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-predict span, .btn-predict svg, .spinner { position: relative; z-index: 1; }
+    .btn-predict svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result */
+    .result-box {
+      margin: 0 32px 28px;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      display: none;
+      animation: slideIn 0.35s ease both;
+    }
+    .result-box.success {
+      background: var(--success-bg);
+      border: 1px solid #AEDBBF;
+    }
+    .result-box.error {
+      background: var(--error-bg);
+      border: 1px solid #F0C0BC;
+    }
+    .result-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--success); margin-bottom: 4px;
+    }
+    .result-box.error .result-label { color: var(--error); }
+    .result-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: var(--success); letter-spacing: -0.5px;
+    }
+    .result-box.error .result-price { font-size: 14px; font-weight: 500; color: var(--error); }
+    .result-note { font-size: 12px; color: var(--success); opacity: 0.7; margin-top: 2px; }
+
+    /* Footer */
+    .footer {
+      margin-top: 28px; text-align: center;
+      font-size: 12px; color: var(--ink-3);
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 520px) {
+      .card-header, .form-body { padding: 22px 20px; }
+      .result-box { margin: 0 20px 22px; }
+      .row.trio { grid-template-columns: 1fr 1fr; }
+      body { padding: 24px 14px 48px; }
     }
   </style>
 </head>
 <body>
+
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14v2l8-2.5V19l-2 1.5V22l3.5-1L15 22v-1.5L13 19v-5.5z"/></svg>
+      </div>
+      <span class="logo-name">SkyFare</span>
+    </div>
+    <p class="tagline">ML-Powered Flight Price Estimation</p>
+  </header>
+
   <div class="card">
-    <h2>✈️ Flight Price Predictor</h2>
-    <form id="predictionForm">
-      <label for="airline">Airline</label>
-      <select id="airline" required>
-        <option value="">Select Airline</option>
-        <option>Indigo</option>
-        <option>SpiceJet</option>
-        <option>Vistara</option>
-        <option>Air_India</option>
-        <option>GO_FIRST</option>
-        <option>AirAsia</option>
-      </select>
+    <div class="card-header">
+      <div>
+        <div class="card-title">Price Predictor</div>
+        <div class="card-subtitle">Fill in your flight details below</div>
+      </div>
+      <span class="badge">Indian Routes</span>
+    </div>
 
-      <label for="source_city">Source City</label>
-      <select id="source_city" required>
-        <option value="">Select Source</option>
-        <option>Delhi</option>
-        <option>Mumbai</option>
-        <option>Bangalore</option>
-        <option>Chennai</option>
-        <option>Kolkata</option>
-        <option>Hyderabad</option>
-      </select>
+    <div class="form-body">
 
-      <label for="departure_time">Departure Time</label>
-      <select id="departure_time" required>
-        <option value="">Select Time</option>
-        <option>Morning</option>
-        <option>Afternoon</option>
-        <option>Evening</option>
-        <option>Night</option>
-        <option>Early_Morning</option>
-      </select>
+      <!-- Live Route Visual -->
+      <div class="route-visual">
+        <div class="route-city">
+          <div class="route-city-name" id="vis-src">—</div>
+          <div class="route-city-label">From</div>
+        </div>
+        <div class="route-arrow">
+          <div class="route-line">
+            <div class="route-dot"></div>
+            <div class="route-dash"></div>
+            <div class="route-plane">
+              <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14v2l8-2.5V19l-2 1.5V22l3.5-1L15 22v-1.5L13 19v-5.5z"/></svg>
+            </div>
+            <div class="route-dash"></div>
+            <div class="route-dot"></div>
+          </div>
+          <div class="stops-badge" id="vis-stops">— stops</div>
+        </div>
+        <div class="route-city">
+          <div class="route-city-name" id="vis-dst">—</div>
+          <div class="route-city-label">To</div>
+        </div>
+      </div>
 
-      <label for="stops">Stops</label>
-      <select id="stops" required>
-        <option value="">Select Stops</option>
-        <option>zero</option>
-        <option>one</option>
-        <option>two_or_more</option>
-      </select>
+      <!-- Route -->
+      <div class="section-label">Route</div>
+      <div class="row">
+        <div class="field">
+          <label for="source_city">Source city</label>
+          <select id="source_city">
+            <option value="">Select city</option>
+            <option>Delhi</option><option>Mumbai</option><option>Bangalore</option>
+            <option>Chennai</option><option>Kolkata</option><option>Hyderabad</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="destination_city">Destination city</label>
+          <select id="destination_city">
+            <option value="">Select city</option>
+            <option>Delhi</option><option>Mumbai</option><option>Bangalore</option>
+            <option>Chennai</option><option>Kolkata</option><option>Hyderabad</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="arrival_time">Arrival Time</label>
-      <select id="arrival_time" required>
-        <option value="">Select Time</option>
-        <option>Morning</option>
-        <option>Afternoon</option>
-        <option>Evening</option>
-        <option>Night</option>
-        <option>Early_Morning</option>
-      </select>
+      <!-- Flight Details -->
+      <div class="section-label">Flight details</div>
+      <div class="row">
+        <div class="field">
+          <label for="airline">Airline</label>
+          <select id="airline">
+            <option value="">Select airline</option>
+            <option>Indigo</option><option>SpiceJet</option><option>Vistara</option>
+            <option>Air_India</option><option>GO_FIRST</option><option>AirAsia</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="class">Cabin class</label>
+          <select id="class">
+            <option value="">Select class</option>
+            <option>Economy</option><option>Business</option>
+          </select>
+        </div>
+      </div>
+      <div class="row trio">
+        <div class="field">
+          <label for="stops">Stops</label>
+          <select id="stops">
+            <option value="">Stops</option>
+            <option value="zero">Non-stop</option>
+            <option value="one">1 Stop</option>
+            <option value="two_or_more">2+ Stops</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="duration">Duration (hrs)</label>
+          <input type="number" id="duration" step="0.5" min="0.5" max="24" placeholder="e.g. 2.5" />
+        </div>
+        <div class="field">
+          <label for="days_left">Days left</label>
+          <input type="number" id="days_left" min="1" max="365" placeholder="e.g. 15" />
+        </div>
+      </div>
 
-      <label for="destination_city">Destination City</label>
-      <select id="destination_city" required>
-        <option value="">Select Destination</option>
-        <option>Delhi</option>
-        <option>Mumbai</option>
-        <option>Bangalore</option>
-        <option>Chennai</option>
-        <option>Kolkata</option>
-        <option>Hyderabad</option>
-      </select>
+      <!-- Timings -->
+      <div class="section-label">Timings</div>
+      <div class="row">
+        <div class="field">
+          <label for="departure_time">Departure time</label>
+          <select id="departure_time">
+            <option value="">Select slot</option>
+            <option value="Early_Morning">Early morning</option>
+            <option value="Morning">Morning</option>
+            <option value="Afternoon">Afternoon</option>
+            <option value="Evening">Evening</option>
+            <option value="Night">Night</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="arrival_time">Arrival time</label>
+          <select id="arrival_time">
+            <option value="">Select slot</option>
+            <option value="Early_Morning">Early morning</option>
+            <option value="Morning">Morning</option>
+            <option value="Afternoon">Afternoon</option>
+            <option value="Evening">Evening</option>
+            <option value="Night">Night</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="class">Class</label>
-      <select id="class" required>
-        <option value="">Select Class</option>
-        <option>Economy</option>
-        <option>Business</option>
-      </select>
+      <!-- Predict Button -->
+      <div class="btn-wrap">
+        <button class="btn-predict" id="predict-btn">
+          <span id="btn-text">Predict price</span>
+          <svg id="btn-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <div class="spinner" id="btn-spinner"></div>
+        </button>
+      </div>
+    </div>
 
-      <label for="duration">Duration (hrs)</label>
-      <input type="number" id="duration" step="0.1" placeholder="e.g., 2.5" required />
-
-      <label for="days_left">Days Left</label>
-      <input type="number" id="days_left" placeholder="e.g., 15" required />
-
-      <button type="submit">Predict Price</button>
-    </form>
-    <div class="result" id="result"></div>
-    <div class="error" id="error"></div>
+    <!-- Result Box (inside card, below form) -->
+    <div class="result-box" id="result-box">
+      <div class="result-label" id="result-label">Estimated price</div>
+      <div class="result-price" id="result-price"></div>
+      <div class="result-note" id="result-note"></div>
+    </div>
   </div>
 
-  <script>
-    document.getElementById("predictionForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      document.getElementById("result").innerText = "";
-      document.getElementById("error").innerText = "";
+  <footer class="footer">
+    Powered by Gradient Boosting Regressor &nbsp;·&nbsp; Indian domestic routes only
+  </footer>
 
-      const data = {
-        airline: document.getElementById("airline").value,
-        source_city: document.getElementById("source_city").value,
-        departure_time: document.getElementById("departure_time").value,
-        stops: document.getElementById("stops").value,
-        arrival_time: document.getElementById("arrival_time").value,
-        destination_city: document.getElementById("destination_city").value,
-        class: document.getElementById("class").value,
-        duration: parseFloat(document.getElementById("duration").value),
-        days_left: parseInt(document.getElementById("days_left").value)
+  <script>
+    const srcSel   = document.getElementById('source_city');
+    const dstSel   = document.getElementById('destination_city');
+    const stopsSel = document.getElementById('stops');
+
+    function updateVisual() {
+      document.getElementById('vis-src').textContent = srcSel.value || '—';
+      document.getElementById('vis-dst').textContent = dstSel.value || '—';
+      const map = { '': '— stops', zero: 'Non-stop', one: '1 Stop', two_or_more: '2+ Stops' };
+      document.getElementById('vis-stops').textContent = map[stopsSel.value] || '— stops';
+    }
+    srcSel.addEventListener('change', updateVisual);
+    dstSel.addEventListener('change', updateVisual);
+    stopsSel.addEventListener('change', updateVisual);
+
+    document.getElementById('predict-btn').addEventListener('click', async () => {
+      const get = id => document.getElementById(id).value;
+
+      const payload = {
+        airline:          get('airline'),
+        source_city:      get('source_city'),
+        departure_time:   get('departure_time'),
+        stops:            get('stops'),
+        arrival_time:     get('arrival_time'),
+        destination_city: get('destination_city'),
+        class:            get('class'),
+        duration:         parseFloat(get('duration')),
+        days_left:        parseInt(get('days_left'))
       };
 
-      try {
-        const res = await fetch("http://127.0.0.1:5000/predict", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
+      const hasEmpty = Object.entries(payload).some(([k, v]) =>
+        v === '' || v === null || v === undefined || (typeof v === 'number' && isNaN(v))
+      );
+      if (hasEmpty) {
+        alert('Please fill in all fields before predicting.');
+        return;
+      }
 
-        const result = await res.json();
-        if (result["Predicted Price"]) {
-          document.getElementById("result").innerText = "Predicted Price: ₹ " + result["Predicted Price"].toFixed(2);
+      const btn     = document.getElementById('predict-btn');
+      const spinner = document.getElementById('btn-spinner');
+      const icon    = document.getElementById('btn-icon');
+      const txt     = document.getElementById('btn-text');
+      const box     = document.getElementById('result-box');
+
+      btn.disabled = true;
+      txt.textContent = 'Predicting...';
+      icon.style.display = 'none';
+      spinner.style.display = 'block';
+      box.style.display = 'none';
+
+      try {
+        const res  = await fetch('http://127.0.0.1:5000/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        box.className = 'result-box';
+
+        if (data['Predicted Price'] !== undefined) {
+          const formatted = '₹ ' + Math.round(data['Predicted Price']).toLocaleString('en-IN');
+          document.getElementById('result-label').textContent = 'Estimated price';
+          document.getElementById('result-price').textContent = formatted;
+          document.getElementById('result-note').textContent =
+            payload.airline + ' · ' + payload.class + ' · ' +
+            (payload.stops === 'zero' ? 'Non-stop' : payload.stops === 'one' ? '1 Stop' : '2+ Stops');
+          box.classList.add('success');
         } else {
-          document.getElementById("error").innerText = "Error: " + (result.Error || "Unexpected issue");
+          document.getElementById('result-label').textContent = 'Error';
+          document.getElementById('result-price').textContent = data.Error || 'Something went wrong.';
+          document.getElementById('result-note').textContent = '';
+          box.classList.add('error');
         }
-      } catch (err) {
-        document.getElementById("error").innerText = "Error: " + err.message;
+
+        box.style.display = 'block';
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      } catch (e) {
+        box.className = 'result-box error';
+        document.getElementById('result-label').textContent = 'Connection error';
+        document.getElementById('result-price').textContent = 'Cannot reach server on port 5000. Make sure Flask is running.';
+        document.getElementById('result-note').textContent = '';
+        box.style.display = 'block';
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } finally {
+        btn.disabled = false;
+        txt.textContent = 'Predict price';
+        icon.style.display = '';
+        spinner.style.display = 'none';
       }
     });
   </script>
