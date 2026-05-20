@@ -9,7 +9,7 @@ CORS(app)  # <-- enable CORS so HTML form can call API
 
 # Load model and pipeline
 model = joblib.load("vscode/model.pkl")
-pipeline = joblib.load("vscpde/pipeline.pkl")
+pipeline = joblib.load("vscode/pipeline.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
